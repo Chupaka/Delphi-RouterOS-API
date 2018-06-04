@@ -2,11 +2,11 @@
 
 Author:        Pavel Skuratovich (aka Chupaka), Minsk, Belarus
 Description:   Implementation of MikroTik RouterOS API Client
-Version:       1.2
+Version:       1.3
 E-Mail:        chupaka@gmail.com
 Support:       http://forum.mikrotik.com/viewtopic.php?t=31555
 Dependencies:  Uses Ararat Synapse Library (http://synapse.ararat.cz/)
-Legal issues:  Copyright © by Pavel Skuratovich
+Legal issues:  Copyright Â© by Pavel Skuratovich
 
                This source code is provided 'as-is', without any express or
                implied warranty. In no event will the author be held liable
@@ -41,6 +41,9 @@ Legal issues:  Copyright © by Pavel Skuratovich
 ********************************************************************************
 
 Version history:
+1.3     June 04, 2018
+        Added support for RouterOS 6.43+ API login method
+
 1.2     June 12, 2013
         Added basic support for API over TLS
 
@@ -257,19 +260,31 @@ var
 begin
   Result := False;
 
-  Res := Query(['/login'], True);
-  if Res.Values[0].Name = '!done' then
-  begin
-    Res2 := Query(['/login', '=name=' + Username, '=response=00' +
-      StrToHex(MD5(#0 + Password + HexToStr(Res['=ret'])))], True);
-    if Res2.Trap then
-      FSock.CloseSocket
-    else
-      Result := True;
-    Res2.Free;
-  end
+  // post-6.43 login method
+  Res := Query(['/login', '=name=' + Username, '=password=' + Password], True);
+  if Res.Trap then
+    // login error
+    FSock.CloseSocket
   else
-    raise Exception.Create('Invalid response: ''' + Res.Values[0].Name + ''', expected ''!done''');
+    if Res.Done then
+    begin
+      if High(Res.Sentences) <> -1 then
+      begin
+        // fallback to pre-6.43 login method
+        Res2 := Query(['/login', '=name=' + Username, '=response=00' +
+          StrToHex(MD5(#0 + Password + HexToStr(Res['=ret'])))], True);
+        if Res2.Trap then
+          FSock.CloseSocket
+        else
+          Result := True;
+        Res2.Free;
+      end
+      else
+        Result := True;
+    end
+    else
+        raise Exception.Create('Invalid response: ''' + Res.Values[0].Name + ''', expected ''!done''');
+  
   Res.Free;
 end;
 
