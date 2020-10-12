@@ -7,7 +7,7 @@ Official API documentation: https://wiki.mikrotik.com/wiki/Manual:API
 MikroTik Forum topic: https://forum.mikrotik.com/viewtopic.php?f=9&t=31555
 
 # Documentation
-This is implementation of MikroTik RouterOS API Client for Delphi. It supports execution of parallel requests to router and has database-like interface for easy use.
+This is an implementation of MikroTik RouterOS API Client for Delphi. It supports execution of parallel requests to a router and has database-like interface for ease of use.
 
 ## Classes
 
@@ -15,8 +15,7 @@ This is implementation of MikroTik RouterOS API Client for Delphi. It supports e
 
 ### TRosApiClient
 
-This class encapsulates properties and methods to make a connection to router via RouterOS API protocol.
-
+This class encapsulates properties and methods to make a connection to a router via RouterOS API protocol.
 
 * function **Connect**(*Hostname*, *Username*, *Password*: String; *Port*: String = '8728'): Boolean;
 
@@ -24,7 +23,7 @@ This function connects to the router and performs login procedure. It returns **
 
 * function **Query**(*Request*: array of String; *GetAllAfterQuery*: Boolean): TROSAPIResult;
 
-Makes a query to the router. **Request** is array of string, first one being the command and others are parameters. If **GetAllAfterQuery** is **True**, then **TROSAPIResult.GetAll** is executed after sending a query.
+Makes a query to the router. **Request** is an array of strings, first one being the command and others are parameters. If **GetAllAfterQuery** is **True**, then **TROSAPIResult.GetAll** is executed after sending a query.
 
 * function **Execute**(*Request*: array of String): Boolean;
 
@@ -36,7 +35,7 @@ With this property you can set timeout value for network operations (in millisec
 
 * property **LastError**: String;
 
-This read-only property contains textual description of last error occured.
+This read-only property contains textual description of the last error occured.
 
 * procedure **Disconnect**;
 
@@ -44,11 +43,11 @@ Disconnects from the router.
 
 ### TRosApiResult
 
-This class gives you an ability to work with data returned from queries. Each command execution is "isolated" in it's **TRosApiResult** object, so you can do parallel requests by calling **TRosApiClient.Query** and receiving several **TRosApiResult** objects.
+This class gives you an ability to work with data returned from queries. Each command execution is "isolated" in its **TRosApiResult** object, so you can do parallel requests by calling **TRosApiClient.Query** and receiving several **TRosApiResult** objects.
 
 * property **ValueByName**[*Name*: String]: String; default;
 
-Returns the value of **Name** parameter (*word* in terms of API) in current sentence. The preferred way of getting the result is the following: **ApiResult['ParmName']** instead of **ApiResult.ValueByName('ParmName')**. You can use param name both with and without leading '=' character (*ApiResult['address']* and *ApiResult['=address']* will return the same result).
+Returns the value of **Name** parameter (*word* in terms of API) in current sentence. The preferred way of getting the result is the following: **ApiResult['ParmName']** instead of **ApiResult.ValueByName('ParmName')**. You can use param name both with and without leading '=' character (*ApiResult['address']* and *ApiResult['=address']* return the same result).
 
 * property **Values**: TRosApiSentence;
 
@@ -68,7 +67,7 @@ Returns number of received sentences after calling **GetAll**.
 
 * property **Eof**: Boolean;
 
-Returns **True** if there's a more sentence(s) in query result.
+Returns **True** if there's more sentence(s) in query result.
 
 * property **Trap**: Boolean;
 
@@ -80,7 +79,7 @@ Returns **True** if '!done' sentence was received in **GetOne**
 
 * procedure **Next**;
 
-Shifts to the next sentence, received in **GetAll**
+Shifts to the next sentence received in **GetAll**
 
 * procedure **Cancel**;
 
@@ -88,11 +87,11 @@ Cancels current command execution.
 
 ## Examples
 
-Sample application **APITest** you can download at [[API_Delphi_Client#Downloads_and_suggestions|Downloads and suggestions]] section
+Sample **APITest** application can be downloaded in Releases section: https://github.com/Chupaka/Delphi-RouterOS-API/releases
 
-### Creating connection to router
+### Creating a connection to a router
 
-At first, we should declare a variable and create an instance of TRosApiClient:
+At first, we should declare a variable and create an instance of *TRosApiClient*:
 
 ```delphi
 var
@@ -101,7 +100,7 @@ var
 RouterOS := TRosApiClient.Create;
 ```
 
-Now we connect to router and perform login procedure:
+Now we connect to the router and perform login procedure:
 
 ```delphi
 if RouterOS.Connect('192.168.0.1', 'admin', 'password') then
@@ -116,7 +115,7 @@ end;
 
 ### Executing queries
 
-All queries are done by calling **Query** function of **TRosApiClient**. It returns an instance of **TRosApiResult**, from which all data are fetched.
+All queries are done by calling **Query** function of **TRosApiClient**. It returns an instance of **TRosApiResult** from which all data is fetched.
 
 ```delphi
 var
@@ -148,7 +147,7 @@ ResListen := ROS.Query(['/log/listen'], False);
 tmrListen.Enabled := True;
 ```
 
-Then we check for new data on timer event:
+Then we check for a new data on timer event:
 
 ```delphi
 procedure TForm1.tmrListenTimer(Sender: TObject);
@@ -177,4 +176,4 @@ end;
 
 ## Downloads and suggestions
 
-For downloads and suggestions see forum thread [http://forum.mikrotik.com/viewtopic.php?f=9&t=31555&start=0 RouterOS API Delphi Client]
+For discussions and suggestions you may check MikroTik Forum thread [RouterOS API Delphi Client](https://forum.mikrotik.com/viewtopic.php?f=9&t=31555&start=0)
